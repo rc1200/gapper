@@ -1,0 +1,36 @@
+{% load static %}
+
+aaaaa {{ def_1_val }}
+
+<p>Date/Time:</p>
+<p id="datetime"></p>
+<hr>
+
+{% for i in def_list %}
+
+my list is :{{ i }} <br>
+
+{% endfor %}
+
+
+<hr>
+
+<h2>p1</h2>
+p1: {{ p1 }}<br>
+name: {{ p1.name }}<br>
+age: {{ p1.age }}<br>
+
+<hr>
+enter text <input type="text" id="myText" value="Some text...">
+<a class="nav-link" href="#" onclick="myFunction()">test</a>
+
+<ul id="orders">aaaaa</ul>
+
+
+<script>
+var dt = new Date();
+document.getElementById("datetime").innerHTML = dt.toLocaleString();
+</script>
+
+<script src="{% static 'assets/js/gallery/ron.js' %}"></script>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
