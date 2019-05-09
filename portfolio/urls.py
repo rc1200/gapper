@@ -16,6 +16,9 @@ urlpatterns = [
     path("gallery3", GalleryView.as_view(), name="gallery3"),
     path("thankyou", views.thankyou, name="thankyou"),
     path("myAjax/<str:ticker>", views.myAjax, name="myAjax"),
+    path('returnStockData/<str:ticker>', views.returnStockData, name='returnStockData'),
+
+
 
 
 

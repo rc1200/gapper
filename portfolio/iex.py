@@ -23,7 +23,7 @@ import pandas as pd
 
 
 # ************* REQUEST VALUES *************
-method = 'GET'
+
 host = 'cloud.iexapis.com'
 
 # access_key = config('IEX_PUBLIC_KEY')
@@ -42,9 +42,6 @@ symbol = 'aapl'
 outputType= 'chart/1m'
 
 
-canonical_querystring = 'token=' + access_key
-canonical_uri = '/beta/stock/{}/{}'.format(symbol,outputType)
-endpoint = "https://" + host + canonical_uri
 
 def sign(key, msg):
     return hmac.new(key.encode('utf-8'), msg.encode('UTF-8'), hashlib.sha256).hexdigest()
@@ -61,45 +58,121 @@ if access_key is None or secret_key is None:
 # print(secret_key)
 
 
-t = datetime.datetime.utcnow()
-iexdate = t.strftime('%Y%m%dT%H%M%SZ')
-datestamp = t.strftime('%Y%m%d') # Date w/o time, used in credential scope
-canonical_headers = 'host:' + host + '\n' + 'x-iex-date:' + iexdate + '\n'
-signed_headers = 'host;x-iex-date'
-payload_hash = hashlib.sha256(('').encode('utf-8')).hexdigest()
-canonical_request = method + '\n' + canonical_uri + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
-algorithm = 'IEX-HMAC-SHA256'
-credential_scope = datestamp + '/' + 'iex_request'
-string_to_sign = algorithm + '\n' +  iexdate + '\n' +  credential_scope + '\n' +  hashlib.sha256(canonical_request.encode('utf-8')).hexdigest()
-signing_key = getSignatureKey(secret_key, datestamp)
-signature = hmac.new(signing_key.encode('utf-8'), (string_to_sign).encode('utf-8'), hashlib.sha256).hexdigest()
-authorization_header = algorithm + ' ' + 'Credential=' + access_key + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
+def getData(symbol, outputType):
 
-headers = {'x-iex-date':iexdate, 'Authorization':authorization_header}
+    # since we can't pass '/' for the Ajax call, we substitue ~~ to /
+    outputType = outputType.replace('**','/')
 
-# ************* SEND THE REQUEST *************
-request_url = endpoint + '?' + canonical_querystring
 
-print('\nBEGIN REQUEST++++++++++++++++++++++++++++++++++++')
-print('Request URL = ' + request_url)
-r = requests.get(request_url, headers=headers)
+    method = 'GET'
+    canonical_querystring = 'token=' + access_key
+    canonical_uri = '/beta/stock/{}/{}'.format(symbol,outputType)
+    endpoint = "https://" + host + canonical_uri
 
-print('\nRESPONSE++++++++++++++++++++++++++++++++++++')
-print('Response code: %d\n' % r.status_code)
-# print(r.text)
-print(r.json())
+    t = datetime.datetime.utcnow()
+    iexdate = t.strftime('%Y%m%dT%H%M%SZ')
+    datestamp = t.strftime('%Y%m%d') # Date w/o time, used in credential scope
+    canonical_headers = 'host:' + host + '\n' + 'x-iex-date:' + iexdate + '\n'
+    signed_headers = 'host;x-iex-date'
+    payload_hash = hashlib.sha256(('').encode('utf-8')).hexdigest()
+    canonical_request = method + '\n' + canonical_uri + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
+    algorithm = 'IEX-HMAC-SHA256'
+    credential_scope = datestamp + '/' + 'iex_request'
+    string_to_sign = algorithm + '\n' +  iexdate + '\n' +  credential_scope + '\n' +  hashlib.sha256(canonical_request.encode('utf-8')).hexdigest()
+    signing_key = getSignatureKey(secret_key, datestamp)
+    signature = hmac.new(signing_key.encode('utf-8'), (string_to_sign).encode('utf-8'), hashlib.sha256).hexdigest()
+    authorization_header = algorithm + ' ' + 'Credential=' + access_key + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
 
-json = r.json()
+    headers = {'x-iex-date':iexdate, 'Authorization':authorization_header}
+
+    # ************* SEND THE REQUEST *************
+    request_url = endpoint + '?' + canonical_querystring
+
+    print('\nBEGIN REQUEST++++++++++++++++++++++++++++++++++++')
+    print('Request URL = ' + request_url)
+    r = requests.get(request_url, headers=headers)
+
+    print('\nRESPONSE++++++++++++++++++++++++++++++++++++')
+    print('Response code: %d\n' % r.status_code)
+    # print(r.text)
+    # print(r.json())
+
+    return r.json()
+
+
+class getStockData(object):
+
+    def __init__(self, symbol, outputType):
+        self.symbol = symbol
+        self.outputType = outputType
+        self.stockJSON = getData(self.symbol, self.outputType)
+        self.df = pd.DataFrame.from_dict(self.stockJSON, orient='columns')
+
+    # def retrievedJSONData(self):
+    #     self.stockJSON = getData(self.symbol, self.outputType)
+    #     return self.stockJSON
+    #
+    # def storeToDataframe(self):
+    #     self.df = pd.DataFrame.from_dict(self.retrievedJSONData(), orient='columns')
+    #     return self.df
+
+    def df_OHLC(self):
+        # self.storeToDataframe()
+        # self.df = self.df.loc[:,['date','open','high','low','close','volume']]
+        return self.df.loc[:,['date','open','high','low','close','volume']]
+
+    def json_OHLC(self):
+        # self.storeToDataframe()
+        jsondata = self.df.loc[:,['date','open','high','low','close','volume']]
+        # jsondata = jsondata.to_json(orient='records')[1:2].replace('[[', '[{')
+        jsondata = jsondata.to_json(orient='records')#.replace('[[', '[{')
+        # jsondata = jsondata.replace(']', '}')
+        # jsondata = jsondata.replace('[', '{')
+        # jsondata = jsondata.replace('"', "'")
+        # jsondata = jsondata.replace(':', ": ")
+        # jsondata = jsondata.replace('[[', "{ ")
+        # jsondata = jsondata.replace(']]', "}")
+        # jsondata = '[' + jsondata + ']'
+
+        # jsondata = self.df.loc[:,['date','open','high','low','close','volume']].to_json(orient='records')
+        # jsondata = self.df.loc[:,['date','open','close','high','low','volume']].to_json(orient='records')
+        # jsondata = '[' + jsondata + ']'
+
+        # jsondata = [{"date": "2019-04-08", "open": 196.42, "close": 200.1, "high": 200.23, "low": 196.34, "volume": 25881697},
+        #  {"date": "2019-04-09", "open": 200.32, "close": 199.5, "high": 202.85, "low": 199.23, "volume": 35768237}]
+
+        # jsondata = '[{"open":196.42,"high":200.23,"low":196.34,"close":200.1,"volume":25881697},{"open":200.32,"high":202.85,"low":199.23,"close":199.5,"volume":35768237}]'
+        return json.loads(jsondata)
+
+
+
+
+mydata = getStockData('aapl', 'chart/1m')
+
+# json = getData(symbol, outputType)
+# mydata.storeToDataframe()
+
+
+print(mydata.stockJSON)
+print(type(mydata.stockJSON))
+print(type(mydata.df_OHLC()))
+
+
+myj = mydata.json_OHLC()
+print(myj)
+print(type(myj))
+
+
 
 # Load the first sheet of the JSON file into a data frame
-df = pd.DataFrame.from_dict(json, orient='columns')
+# df = pd.DataFrame.from_dict(json, orient='columns')
 
 # print(df)
 
 
 # reduce data to OHLC
-df = df.loc[:,['date','open','high','low','close','volume']]
-print(df)
+# df = df.loc[:,['date','open','high','low','close','volume']]
+# print(df)
 
 
 #

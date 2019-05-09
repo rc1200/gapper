@@ -50,24 +50,28 @@ $("a").click(function(){
 function myFunction2() {
 //  alert("Hello! I am an alert box! in myFunction");
 
-  var $orders = $('#orders');
-  var myText = $('#myOpt');
+
+
+
+  var $orders = $('#appendStockData');
+  var symbol = $('#symbol').val();
+  var outputType = $('#outputType').val();
 //  var myText = $('#myText');
-  alert(myText);
+  alert(outputType);
 
       $.ajax({
             type: 'GET',
-            url: '/myAjax/' + myText.val(),
+            url: '/returnStockData/' + symbol + '~' + outputType,
 //            url: 'http://127.0.0.1:8000/myAjax/',
             data: {'id': 'id', 'csrfmiddlewaretoken': '{{ csrf_token }}'},
             dataType: 'json',
             success: function (data_dict) {
                 console.log('ajax should work');
                 console.log('success', data_dict);
-                $orders.append('<li>' + data_dict.name + '</li>');
+                $orders.append('<li>' + data_dict[0].date + '</li>');
                 $orders.append('data in loop');
-                $.each(data_dict, function(i, data_x) {
-                    $orders.append('<li>' + data_x + '</li>');
+                $.each(data_dict, function(i, iterData) {
+                    $orders.append('<li>' + data_dict[i].open + ' ~~ ' + iterData.low + '</li>');
                 });
                 $orders.append('<hr>');
 

@@ -26,14 +26,32 @@ enter text <input type="text" id="myText" value="Some text...">
 <ul id="orders">Will Append below this UL with li items</ul>
 
 
+<div id="stockData">
+    <span>
+        Symbol
+        <select name="symbol" id="symbol" >
+          <option value="aapl">aapl</option>
+          <option value="market">market</option>
+          <option value=""></option>
+          <option value=""></option>
+        </select>
+    </span>
+    <span>
+        outputType
+        <select name="outputType" id="outputType">
+            <option value="ohlc">ohlc</option>
+            <option value="chart**1m">chart**1m</option>
+        </select>
+    </span>
+</div>
 
-<select id="myOpt" >
-  <option value="aapl">aapl</option>
-  <option value="market">market</option>
-  <option value=""></option>
-  <option value=""></option>
-</select>
+<div id="appendStockData">
+    aaaaaaaaaaaaa
+</div>
+
+
 <button type="button" onclick="myFunction2()">get data2</button>
+
 
 <script>
 var dt = new Date();

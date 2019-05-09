@@ -7,7 +7,7 @@ from .forms import ContactMeForm
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from .utilities import def_1_val, def_list, p1, Person
-
+from .iex import getStockData
 
 
 from django.http import JsonResponse
@@ -36,6 +36,57 @@ def myAjax(request, ticker):
     return JsonResponse(test, safe=False)
     # stuff_for_frontend = {'def_1_val': def_1_val, 'def_list': def_list, 'p1': p1}
     # return render(request, "portfolio/index3.html", stuff_for_frontend)
+
+
+
+def returnStockData(request, ticker):
+    j1 = 'test J1'
+    j2 = 'test J2'
+    j3 = 'test J3 xx'
+    # test = [{"id": 1}, {"id": 2}, {"id": 3}]
+
+    symbol, outputType = ticker.split('~')
+    print('stock return data test',symbol, outputType)
+
+    ronstock = getStockData(symbol, outputType)
+    print('sending to front enddddddddddddddddddddddddd', ronstock.stockJSON)
+
+    a1 = Person(ticker, 55)
+    print(p1)
+    print(p1.name)
+    print(p1.age)
+    print(p1.jsonReturn())
+    test = a1.jsonReturn()
+    # test = {"id": 1}
+    jsondata = ronstock.stockJSON
+    jsondata = ronstock.json_OHLC()
+
+
+    print('retrievedJSONData................', type(ronstock.stockJSON))
+    print('json_OHLC................', type(ronstock.json_OHLC()))
+    # print('json_OHLC................', type(ronstock.json_OHLC().to_json(orient='records')))
+
+    print('name................', request.method)
+    print('data................', request)
+    print('data................', ticker)
+    print('test................', test)
+    sampleJson = 	{'color': "red"}
+        # ,{'color': "green"}
+
+    # return JsonResponse(test, safe=False)
+    return JsonResponse(jsondata , safe=False)
+    # stuff_for_frontend = {'def_1_val': def_1_val, 'def_list': def_list, 'p1': p1}
+    # return render(request, "portfolio/index3.html", stuff_for_frontend)
+
+
+
+
+
+
+
+
+
+
 
 
 
