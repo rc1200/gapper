@@ -100,6 +100,28 @@ def getData(symbol, outputType):
     return r.json()
 
 
+class ShortList(object):
+
+    def __init__(self, lowPrice, highPrice):
+        self.lowPrice = lowPrice
+        self.highPrice = highPrice
+        self.__symbol = 'market'
+        self.__outputType= 'ohlc'
+        self.filteredStocks = getData(self.__symbol, self.__outputType)
+        # self.df = pd.DataFrame(self.filteredStocks)
+        self.df = pd.DataFrame.from_dict(self.filteredStocks, orient='index')
+
+
+    def mydata (self):
+        print(self.lowPrice)
+        print(self.highPrice)
+        # print(self.filteredStocks)
+        print(self.df.head())
+
+aaa = ShortList(1,1000)
+aaa.mydata()
+
+
 class getStockData(object):
 
     def __init__(self, symbol, outputType):
@@ -108,59 +130,31 @@ class getStockData(object):
         self.stockJSON = getData(self.symbol, self.outputType)
         self.df = pd.DataFrame.from_dict(self.stockJSON, orient='columns')
 
-    # def retrievedJSONData(self):
-    #     self.stockJSON = getData(self.symbol, self.outputType)
-    #     return self.stockJSON
-    #
-    # def storeToDataframe(self):
-    #     self.df = pd.DataFrame.from_dict(self.retrievedJSONData(), orient='columns')
-    #     return self.df
-
     def df_OHLC(self):
-        # self.storeToDataframe()
-        # self.df = self.df.loc[:,['date','open','high','low','close','volume']]
         return self.df.loc[:,['date','open','high','low','close','volume']]
 
     def json_OHLC(self):
-        # self.storeToDataframe()
         jsondata = self.df.loc[:,['date','open','high','low','close','volume']]
-        # jsondata = jsondata.to_json(orient='records')[1:2].replace('[[', '[{')
+
+        # converting dataframe back to JSON
         jsondata = jsondata.to_json(orient='records')#.replace('[[', '[{')
-        # jsondata = jsondata.replace(']', '}')
-        # jsondata = jsondata.replace('[', '{')
-        # jsondata = jsondata.replace('"', "'")
-        # jsondata = jsondata.replace(':', ": ")
-        # jsondata = jsondata.replace('[[', "{ ")
-        # jsondata = jsondata.replace(']]', "}")
-        # jsondata = '[' + jsondata + ']'
-
-        # jsondata = self.df.loc[:,['date','open','high','low','close','volume']].to_json(orient='records')
-        # jsondata = self.df.loc[:,['date','open','close','high','low','volume']].to_json(orient='records')
-        # jsondata = '[' + jsondata + ']'
-
-        # jsondata = [{"date": "2019-04-08", "open": 196.42, "close": 200.1, "high": 200.23, "low": 196.34, "volume": 25881697},
-        #  {"date": "2019-04-09", "open": 200.32, "close": 199.5, "high": 202.85, "low": 199.23, "volume": 35768237}]
-
-        # jsondata = '[{"open":196.42,"high":200.23,"low":196.34,"close":200.1,"volume":25881697},{"open":200.32,"high":202.85,"low":199.23,"close":199.5,"volume":35768237}]'
         return json.loads(jsondata)
 
 
 
-
-mydata = getStockData('aapl', 'chart/1m')
-
-# json = getData(symbol, outputType)
-# mydata.storeToDataframe()
-
-
-print(mydata.stockJSON)
-print(type(mydata.stockJSON))
-print(type(mydata.df_OHLC()))
+# Testing Class getStockData
+# mydata = getStockData('aapl', 'chart/1m')
+# print(mydata.stockJSON)
+# print(mydata.df)
 
 
-myj = mydata.json_OHLC()
-print(myj)
-print(type(myj))
+
+
+
+
+
+
+
 
 
 

@@ -83,6 +83,14 @@ def returnStockData(request, ticker):
 
 
 
+def returnStockDataPriceRange(request, ticker):
+
+    lowerRange, higherRange = ticker.split('~')
+
+    print('go here??????????????????????????????????????????????????????????', ticker, lowerRange, higherRange)
+    jsondata = [{"open":196.42,"high":200.23,"low":196.34,"close":200.1,"volume":25881697},{"open":200.32,"high":202.85,"low":199.23,"close":199.5,"volume":35768237}]
+    print('jsondata is 3333333333333333333333333333333333333333', type(jsondata))
+    return JsonResponse(jsondata , safe=False)
 
 
 

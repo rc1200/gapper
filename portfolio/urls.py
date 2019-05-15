@@ -17,6 +17,7 @@ urlpatterns = [
     path("thankyou", views.thankyou, name="thankyou"),
     path("myAjax/<str:ticker>", views.myAjax, name="myAjax"),
     path('returnStockData/<str:ticker>', views.returnStockData, name='returnStockData'),
+    path('returnStockDataPriceRange/<str:ticker>', views.returnStockDataPriceRange, name='returnStockDataPriceRange'),
 
 
 

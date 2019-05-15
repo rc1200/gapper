@@ -50,9 +50,6 @@ $("a").click(function(){
 function myFunction2() {
 //  alert("Hello! I am an alert box! in myFunction");
 
-
-
-
   var $orders = $('#appendStockData');
   var symbol = $('#symbol').val();
   var outputType = $('#outputType').val();
@@ -74,6 +71,36 @@ function myFunction2() {
                     $orders.append('<li>' + data_dict[i].open + ' ~~ ' + iterData.low + '</li>');
                 });
                 $orders.append('<hr>');
+
+            }
+        });
+}
+
+
+function returnStockDataPriceRange() {
+//  alert("Hello! I am an alert box! in myFunction");
+
+  var appendFilteredPrice = $('#appendFilteredPrice');
+  var lprice = $('#lprice').val();
+  var hprice = $('#hprice').val();
+//  var myText = $('#myText');
+//  alert(lprice + " sdfsdf " + hprice);
+
+      $.ajax({
+            type: 'GET',
+            url: '/returnStockDataPriceRange/' + lprice + '~' + hprice,
+//            url: 'http://127.0.0.1:8000/myAjax/',
+            data: {'id': 'id', 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+            dataType: 'json',
+            success: function (data_dict) {
+                console.log('ajax should work');
+                console.log('success', data_dict);
+                appendFilteredPrice.append('<li>' + data_dict[0].date + '</li>');
+                appendFilteredPrice.append('data in loop');
+                $.each(data_dict, function(i, iterData) {
+                    appendFilteredPrice.append('<li>' + data_dict[i].open + ' ~~ ' + iterData.low + '</li>');
+                });
+                appendFilteredPrice.append('<hr>');
 
             }
         });

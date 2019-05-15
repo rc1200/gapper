@@ -53,6 +53,14 @@ enter text <input type="text" id="myText" value="Some text...">
 <button type="button" onclick="myFunction2()">get data2</button>
 
 
+<br>
+Lowest Price <input type="text" id="lprice" value="0">
+Highest Price <input type="text" id="hprice" value="3000">
+<button type="button" onclick="returnStockDataPriceRange()">get data om price range</button>
+<ul id="appendFilteredPrice">Will Append below this UL with li items</ul>
+
+
+
 <script>
 var dt = new Date();
 document.getElementById("datetime").innerHTML = dt.toLocaleString();
