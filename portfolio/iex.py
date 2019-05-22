@@ -107,19 +107,96 @@ class ShortList(object):
         self.highPrice = highPrice
         self.__symbol = 'market'
         self.__outputType= 'ohlc'
-        self.filteredStocks = getData(self.__symbol, self.__outputType)
+        self.JSONfilteredStocks = getData(self.__symbol, self.__outputType)
         # self.df = pd.DataFrame(self.filteredStocks)
-        self.df = pd.DataFrame.from_dict(self.filteredStocks, orient='index')
+        self.df = pd.DataFrame.from_dict(self.JSONfilteredStocks, orient='index')
+
+
+
+        # drop column to see if we can speed up performance
+        # self.df.drop(['open'], axis=1, inplace=True)
 
 
     def mydata (self):
         print(self.lowPrice)
         print(self.highPrice)
-        # print(self.filteredStocks)
-        print(self.df.head())
+        # print(self.df.loc['TRNE'])
+
+        print(self.JSONfilteredStocks)
+        print(self.df.close.values.tolist())
+        # print(self.df.index.values.tolist())
+
+    def fliterByPrice (self):
+        self.df2 = self.df
+        self.df2['strClose'] = self.df.close.astype(str)
+        self.df2['closePrice'] = self.df2['strClose'].str.extract('([0-9]+\.[0-9]+)', expand=True).astype(float)
+        self.df2.drop(['open', 'close', 'strClose'], axis=1, inplace=True)
+        df_filtered = self.df2[(self.df2.closePrice >= 10) & (self.df2.closePrice <= 10.33)]
+        df_filtered_list = df_filtered.values.tolist()
+        df_filtered_Index_list = df_filtered.index.tolist()
+        print(df_filtered)
+        print(df_filtered_Index_list)
+        print(df_filtered_list)
+
+
+
+# remove NaN
+
+
+        # extract the dictionary value from the dataframe column 'close' as a list then feed into a new dataframe
+        # convert to string so we can do a replace command to remove the nan,
+
+
+
+        # print(tempList)
+
+
+        # # split the dictionary values and store to new dataframe
+        # df2 = pd.DataFrame(tempList)
+        # # set the index to be the same value as the original Dataframe
+        # df2.set_index(self.df.index, inplace=True)
+        # # # combine both datafrmae based on the index value (stock symbol)
+        # df = pd.concat([self.df, df2], axis=1, join_axes=[self.df.index])
+        #
+        # print(df)
+
+        # # drop the columns you don't need
+        # df.drop(['open', 'close', 'time'], axis=1, inplace=True)
+        # # rename column
+        # df.rename(columns={'price': 'closing_price'}, inplace=True)
+        # # filter based on range - create new dataframe to store value
+        # df_filtered = df[(df.closing_price >= 10) & (df.closing_price <= 33.33)]
+
 
 aaa = ShortList(1,1000)
-aaa.mydata()
+# print('1111')
+# aaa.mydata()
+print('222')
+aaa.fliterByPrice()
+# print(aaa.df2)
+
+
+
+
+# # ---------------------------- following code works
+# # Store JSON data into dataframe
+# df = pd.DataFrame.from_dict(json, orient='index')
+# # extract the dictionary value from the dataframe column 'close' as a list then feed into a new dataframe
+# df2 = pd.DataFrame(df['close'].values.tolist())
+# # set the index to be the same value as the original Dataframe
+# df2.set_index(df.index, inplace =True)
+# # combine both datafrmae based on the index value (stock symbol)
+# df = pd.concat([df, df2], axis=1, join_axes=[df.index])
+# # drop the columns you don't need
+# df.drop(['open','close','time'], axis=1, inplace=True)
+# # rename column
+# df.rename(columns={'price': 'closing_price'}, inplace=True)
+# # filter based on range - create new dataframe to store value
+# df_filtered = df[(df.closing_price >= 10) & (df.closing_price <= 33.33)]
+# # -------------------------
+
+
+
 
 
 class getStockData(object):
@@ -143,39 +220,24 @@ class getStockData(object):
 
 
 
-# ---------------------------- following code works
-# Store JSON data into dataframe
-df = pd.DataFrame.from_dict(json, orient='index')
-# extract the dictionary value from the dataframe column 'close' as a list then feed into a new dataframe
-df2 = pd.DataFrame(df['close'].values.tolist())
-# set the index to be the same value as the original Dataframe
-df2.set_index(df.index, inplace =True)
-# combine both datafrmae based on the index value (stock symbol)
-df = pd.concat([df, df2], axis=1, join_axes=[df.index])
-# drop the columns you don't need
-df.drop(['open','close','time'], axis=1, inplace=True)
-# rename column
-df.rename(columns={'price': 'closing_price'}, inplace=True)
-# filter based on range - create new dataframe to store value
-df_filtered = df[(df.closing_price >= 10) & (df.closing_price <= 33.33)]
-# -------------------------
 
 
 
-df.drop('open', axis=1, inplace=True)
+
+# df.drop('open', axis=1, inplace=True)
 # Testing Class getStockData
 # mydata = getStockData('aapl', 'chart/1m')
 # print(mydata.stockJSON)
 # print(mydata.df)
 
 from pandas.io.json import json_normalize
-df = pd.DataFrame.from_dict(json, orient='index')
-df['ddd'] = df['close'].astype(str)
-df['eee'] = df['ddd'].str.extract('time...(\d+)', expand=True)
+# df = pd.DataFrame.from_dict(json, orient='index')
+# df['ddd'] = df['close'].astype(str)
+# df['eee'] = df['ddd'].str.extract('time...(\d+)', expand=True)
 
 
-or other option is to have dataframe converted to dictionary then use the map
-... ie see http://cmdlinetips.com/2018/01/how-to-add-a-new-column-to-using-a-dictionary-in-pandas-data-frame/
+# or other option is to have dataframe converted to dictionary then use the map
+# ... ie see http://cmdlinetips.com/2018/01/how-to-add-a-new-column-to-using-a-dictionary-in-pandas-data-frame/
 
 
 
