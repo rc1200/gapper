@@ -49,7 +49,7 @@ def returnStockData(request, ticker):
     print('stock return data test',symbol, outputType)
 
     ronstock = getStockData(symbol, outputType)
-    print('sending to front enddddddddddddddddddddddddd', ronstock.stockJSON)
+    print('sending to front enddddddddddddddddddddddddd', ronstock._stockJSON)
 
     a1 = Person(ticker, 55)
     print(p1)
@@ -58,13 +58,13 @@ def returnStockData(request, ticker):
     print(p1.jsonReturn())
     test = a1.jsonReturn()
     # test = {"id": 1}
-    jsondata = ronstock.stockJSON
-    jsondata = ronstock.json_OHLC()
+    jsondata = ronstock._stockJSON
+    jsondata = ronstock.get_json_OHLC()
 
 
-    print('retrievedJSONData................', type(ronstock.stockJSON))
-    print('json_OHLC................', type(ronstock.json_OHLC()))
-    # print('json_OHLC................', type(ronstock.json_OHLC().to_json(orient='records')))
+    print('retrievedJSONData................', type(ronstock._stockJSON))
+    print('get_json_OHLC................', type(ronstock.get_json_OHLC()))
+    # print('get_json_OHLC................', type(ronstock.get_json_OHLC().to_json(orient='records')))
 
     print('name................', request.method)
     print('data................', request)

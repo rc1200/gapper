@@ -97,105 +97,14 @@ def getData(symbol, outputType):
     # print(r.text)
     # print(r.json())
 
-    return r.json()
+    if r:
+        return r.json()
+        # print('goood')
 
-
-class ShortList(object):
-
-    def __init__(self, lowPrice, highPrice):
-        self.lowPrice = lowPrice
-        self.highPrice = highPrice
-        self.__symbol = 'market'
-        self.__outputType= 'ohlc'
-        self.JSONfilteredStocks = getData(self.__symbol, self.__outputType)
-        # self.df = pd.DataFrame(self.filteredStocks)
-        self.df = pd.DataFrame.from_dict(self.JSONfilteredStocks, orient='index')
-
-
-
-        # drop column to see if we can speed up performance
-        # self.df.drop(['open'], axis=1, inplace=True)
-
-
-    def mydata (self):
-        print(self.lowPrice)
-        print(self.highPrice)
-        # print(self.df.loc['TRNE'])
-
-        print(self.JSONfilteredStocks)
-        print(self.df.close.values.tolist())
-        # print(self.df.index.values.tolist())
-
-    def fliterByPrice (self):
-        self.df2 = self.df
-        self.df2['strClose'] = self.df.close.astype(str)
-        self.df2['closePrice'] = self.df2['strClose'].str.extract('([0-9]+\.[0-9]+)', expand=True).astype(float)
-        self.df2.drop(['open', 'close', 'strClose'], axis=1, inplace=True)
-        df_filtered = self.df2[(self.df2.closePrice >= 10) & (self.df2.closePrice <= 10.33)]
-        df_filtered_list = df_filtered.values.tolist()
-        df_filtered_Index_list = df_filtered.index.tolist()
-        print(df_filtered)
-        print(df_filtered_Index_list)
-        print(df_filtered_list)
-
-
-
-# remove NaN
-
-
-        # extract the dictionary value from the dataframe column 'close' as a list then feed into a new dataframe
-        # convert to string so we can do a replace command to remove the nan,
-
-
-
-        # print(tempList)
-
-
-        # # split the dictionary values and store to new dataframe
-        # df2 = pd.DataFrame(tempList)
-        # # set the index to be the same value as the original Dataframe
-        # df2.set_index(self.df.index, inplace=True)
-        # # # combine both datafrmae based on the index value (stock symbol)
-        # df = pd.concat([self.df, df2], axis=1, join_axes=[self.df.index])
-        #
-        # print(df)
-
-        # # drop the columns you don't need
-        # df.drop(['open', 'close', 'time'], axis=1, inplace=True)
-        # # rename column
-        # df.rename(columns={'price': 'closing_price'}, inplace=True)
-        # # filter based on range - create new dataframe to store value
-        # df_filtered = df[(df.closing_price >= 10) & (df.closing_price <= 33.33)]
-
-
-aaa = ShortList(1,1000)
-# print('1111')
-# aaa.mydata()
-print('222')
-aaa.fliterByPrice()
-# print(aaa.df2)
-
-
-
-
-# # ---------------------------- following code works
-# # Store JSON data into dataframe
-# df = pd.DataFrame.from_dict(json, orient='index')
-# # extract the dictionary value from the dataframe column 'close' as a list then feed into a new dataframe
-# df2 = pd.DataFrame(df['close'].values.tolist())
-# # set the index to be the same value as the original Dataframe
-# df2.set_index(df.index, inplace =True)
-# # combine both datafrmae based on the index value (stock symbol)
-# df = pd.concat([df, df2], axis=1, join_axes=[df.index])
-# # drop the columns you don't need
-# df.drop(['open','close','time'], axis=1, inplace=True)
-# # rename column
-# df.rename(columns={'price': 'closing_price'}, inplace=True)
-# # filter based on range - create new dataframe to store value
-# df_filtered = df[(df.closing_price >= 10) & (df.closing_price <= 33.33)]
-# # -------------------------
-
-
+    else:
+        # fill with dummy data to avoid crash
+        return [{ "date": "2019-05-01", "open": 0, "close": 0, "high": 0, "low": 0, "volume": 0, "uOpen": 0, "uClose": 0, "uHigh": 0, "uLow": 0, "uVolume": 0, "change": 0, "changePercent": 0, "label": "May 1", "changeOverTime": 0 } ]
+        # print('404 errorxxxxxxxx')
 
 
 
@@ -204,22 +113,176 @@ class getStockData(object):
     def __init__(self, symbol, outputType):
         self.symbol = symbol
         self.outputType = outputType
-        self.stockJSON = getData(self.symbol, self.outputType)
-        self.df = pd.DataFrame.from_dict(self.stockJSON, orient='columns')
+        self._stockJSON = getData(self.symbol, self.outputType)
+        self._df = pd.DataFrame.from_dict(self._stockJSON, orient='columns')
+        self.volume = self.get_Volume()
 
-    def df_OHLC(self):
-        return self.df.loc[:,['date','open','high','low','close','volume']]
+    def get_df_OHLC(self):
+        return self._df.loc[:, ['date', 'open', 'high', 'low', 'close', 'volume']]
 
-    def json_OHLC(self):
-        jsondata = self.df.loc[:,['date','open','high','low','close','volume']]
+    def get_json_OHLC(self):
+        jsondata = self._df.loc[:, ['date', 'open', 'high', 'low', 'close', 'volume']]
 
         # converting dataframe back to JSON
         jsondata = jsondata.to_json(orient='records')#.replace('[[', '[{')
         return json.loads(jsondata)
 
+    def get_Volume(self):
+        if not self._df.empty:
+            return self.get_df_OHLC().volume.iloc[-1]
+        else:
+            return 0
+
+    def get_Open(self):
+        if not self._df.empty:
+            return self.get_df_OHLC().open.iloc[-1]
+        else:
+            return 0
+
+    def get_High(self):
+        if not self._df.empty:
+            return self.get_df_OHLC().high.iloc[-1]
+        else:
+            return 0
+
+    def get_Low(self):
+        if not self._df.empty:
+            return self.get_df_OHLC().low.iloc[-1]
+        else:
+            return 0
+
+    def get_Close(self):
+        if not self._df.empty:
+            return self.get_df_OHLC().close.iloc[-1]
+        else:
+            return 0
+
+class ShortList(object):
+
+    def __init__(self, lowPrice, highPrice):
+        self.lowPrice = lowPrice
+        self.highPrice = highPrice
+        self.FilteredbyPriceList = self.getFilteredbyPriceList()
+
+    def getJsonFliterByPrice (self):
+
+        self.__symbol = 'market'
+        self.__outputType= 'ohlc'
+        self.JSONfilteredStocks = getData(self.__symbol, self.__outputType)
+        self.df = pd.DataFrame.from_dict(self.JSONfilteredStocks, orient='index')
+
+        df2 = self.df
+        df2['strClose'] = self.df.close.astype(str)
+        df2['closePrice'] = df2['strClose'].str.extract('([0-9]+\.[0-9]+)', expand=True).astype(float)
+        df2.drop(['open', 'close', 'strClose'], axis=1, inplace=True)
+        df_filtered = df2[(df2.closePrice >= self.lowPrice) & (df2.closePrice <= self.highPrice)]
+        outJson = df_filtered.to_json(orient='index')  #[:].replace('},{', '} {')
+
+        return outJson
+
+    def getFilteredbyPriceList(self):
+        # converts the JSON object into a list
+        volumeList = []
+        jsonObject = json.loads(self.getJsonFliterByPrice())
+        # the format looks like this and the <class 'dict'> --- {"ACAMU":{"closePrice":10.04},"AFSI-E":{"closePrice":10.04},"AGBAU":{"closePrice"
+        for key in jsonObject:
+            volumeList.append(key)
+        return volumeList
 
 
 
+
+class FilterByVolume(ShortList):
+
+    def __init__(self, lowPrice, highPrice, volumeLowerRange):
+        super().__init__(lowPrice, highPrice) # inherit from ShortList class instead
+        self.volumeLowerRange = volumeLowerRange
+        self.volumeSymbolList = self.getFilteredbyPriceList() # self.getFilteredbyPriceList() from base class ShortList
+
+
+    def getObjectsWithVolumeInRange(self):
+
+        # collects a list of getStockData objects based on the price and volume filter
+
+        classList = []
+        print('inside getObjectsWithVolumeInRange the list is: ', self.volumeSymbolList)
+
+        for i in self.volumeSymbolList:
+            tempClass = getStockData(i, 'chart/1m')
+            if tempClass.get_Volume() >= self.volumeLowerRange:
+                classList.append(tempClass)
+                print('adding {} to class list'.format(i))
+
+# feeding data in for testing... remove later
+
+        tempClass = getStockData('aapl', 'chart/1m')
+        print('the symbol is ', tempClass.symbol)
+        print('the volume is ', tempClass.get_Volume())
+        # print('the json OHLC is ', tempClass.get_json_OHLC())
+        if tempClass.get_Volume() >= self.volumeLowerRange:
+            classList.append(tempClass)
+            print('adding to class list')
+
+        tempClass = getStockData('AMZN', 'chart/1m')
+        print(tempClass.symbol)
+        print(tempClass.get_Volume())
+        # print(tempClass.get_json_OHLC())
+        if tempClass.get_Volume() >= self.volumeLowerRange:
+            classList.append(tempClass)
+            print('adding to class list')
+
+# feeding data in for testing... remove later
+
+        return classList
+
+
+
+# --------------------------------------------------------------------------------------------------------------
+
+# aaa = ShortList(10,10.22)
+# print('1111')
+# aaa.mydata()
+# print('222')
+# print(aaa.getJsonFliterByPrice())
+# print(aaa.getFilteredPrice())
+# print(aaa.df2)
+
+
+# used this new class that inherits from ShortList
+# bbb = FilterByVolume (10, 10.04,77777)
+#
+# # list of stocks within range stored in class
+# print('getFilteredbyPriceList is ', bbb.getFilteredbyPriceList())
+# print('the list of stocks for array [1] is: ',bbb.getFilteredbyPriceList()[1])
+
+
+xxx = getStockData('aapl', 'chart/1m')
+
+print(xxx.symbol)
+print(xxx.volume)
+print(xxx.get_Open())
+print(xxx.get_High())
+print(xxx.get_Low())
+print(xxx.get_Close())
+
+
+
+# stockJSON
+# df
+# print(xxx.stockJSON)
+# print(xxx.df)
+# print(xxx.get_Volume())
+
+
+# mydata = getStockData('aapl', 'chart/1m')
+# print(mydata.stockJSON)
+# print(mydata.df)
+# print(mydata.df.iloc[-1])
+
+
+
+# print(getStockData('aapl', 'chart/1m').df.volume.iloc[-1])
+# print('the volue is ', getStockData('aapl', 'chart/1m').get_Volume())
 
 
 
