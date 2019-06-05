@@ -115,7 +115,13 @@ class getStockData(object):
         self.outputType = outputType
         self._stockJSON = getData(self.symbol, self.outputType)
         self._df = pd.DataFrame.from_dict(self._stockJSON, orient='columns')
+
         self.volume = self.get_Volume()
+        self.open = self.get_Open()
+        self.high = self.get_High()
+        self.low = self.get_Low()
+        self.close = self.get_Close()
+
 
     def get_df_OHLC(self):
         return self._df.loc[:, ['date', 'open', 'high', 'low', 'close', 'volume']]
@@ -127,35 +133,56 @@ class getStockData(object):
         jsondata = jsondata.to_json(orient='records')#.replace('[[', '[{')
         return json.loads(jsondata)
 
-    def get_Volume(self):
+    def get_Volume(self, offset=-1):
         if not self._df.empty:
-            return self.get_df_OHLC().volume.iloc[-1]
+            return self.get_df_OHLC().volume.iloc[offset]
         else:
             return 0
 
-    def get_Open(self):
+    def get_Open(self, offset=-1):
         if not self._df.empty:
-            return self.get_df_OHLC().open.iloc[-1]
+            return self.get_df_OHLC().open.iloc[offset]
         else:
             return 0
 
-    def get_High(self):
+    def get_High(self, offset=-1):
         if not self._df.empty:
-            return self.get_df_OHLC().high.iloc[-1]
+            return self.get_df_OHLC().high.iloc[offset]
         else:
             return 0
 
-    def get_Low(self):
+    def get_Low(self, offset=-1):
         if not self._df.empty:
-            return self.get_df_OHLC().low.iloc[-1]
+            return self.get_df_OHLC().low.iloc[offset]
         else:
             return 0
 
-    def get_Close(self):
+    def get_Close(self, offset = -1):
         if not self._df.empty:
-            return self.get_df_OHLC().close.iloc[-1]
+            return self.get_df_OHLC().close.iloc[offset]
         else:
             return 0
+
+    def get_lowest_of_day(self ):
+        tempdf = self._df.loc[len(self._df)-1:, ['open', 'high', 'low', 'close']]
+        maxval = tempdf.min(axis=1).values[0]
+        # justval = maxval.values[0]
+        print(tempdf)
+        print(tempdf.min(axis=1).values[0])
+        print(tempdf.max(axis=1).values[0])
+
+
+
+        return (1)
+
+    def get_highest_of_day(self, offset = -1):
+        pass
+
+
+    def check_gap_buy(self):
+         # if open > previous close &  open > previous high
+        pass
+
 
 class ShortList(object):
 
@@ -260,10 +287,14 @@ xxx = getStockData('aapl', 'chart/1m')
 
 print(xxx.symbol)
 print(xxx.volume)
+print('opensssssssssssss')
+print(xxx.open)
 print(xxx.get_Open())
-print(xxx.get_High())
-print(xxx.get_Low())
-print(xxx.get_Close())
+print(xxx.get_lowest_of_day())
+print(xxx.get_df_OHLC())
+# print(xxx.high)
+# print(xxx.low)
+# print('the close is: ',xxx.get_Close)
 
 
 
