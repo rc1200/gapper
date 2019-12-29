@@ -17,6 +17,14 @@ import requests # pip install requests
 import json
 
 from decouple import config # pip install python-decouple
+# see example of decouple where you use a .env file in the root to store your credentials
+    # SECRET_KEY = config('SECRET_KEY')
+    # DEBUG = config('DEBUG', cast=bool)
+# the SECRET_KEY and DEBUG defined in the .env file something like:
+    # SECRET_KEY=3izb^ryglj(bvrjb2_y1fZvcnbky#358_l6-nn#i8fkug4mmz!
+    # DEBUG=True
+# As well in Heroku, you can got o Settings tab click on the Reveal Config Vars 
+# https://simpleisbetterthancomplex.com/2015/11/26/package-of-the-week-python-decouple.html
 import pandas as pd
 
 
@@ -118,8 +126,8 @@ class ShortList(object):
         # print(self.filteredStocks)
         print(self.df.head())
 
-aaa = ShortList(1,1000)
-aaa.mydata()
+# aaa = ShortList(1,1000)
+# aaa.mydata()
 
 
 class getStockData(object):
@@ -145,37 +153,37 @@ class getStockData(object):
 
 # ---------------------------- following code works
 # Store JSON data into dataframe
-df = pd.DataFrame.from_dict(json, orient='index')
-# extract the dictionary value from the dataframe column 'close' as a list then feed into a new dataframe
-df2 = pd.DataFrame(df['close'].values.tolist())
-# set the index to be the same value as the original Dataframe
-df2.set_index(df.index, inplace =True)
-# combine both datafrmae based on the index value (stock symbol)
-df = pd.concat([df, df2], axis=1, join_axes=[df.index])
-# drop the columns you don't need
-df.drop(['open','close','time'], axis=1, inplace=True)
-# rename column
-df.rename(columns={'price': 'closing_price'}, inplace=True)
-# filter based on range - create new dataframe to store value
-df_filtered = df[(df.closing_price >= 10) & (df.closing_price <= 33.33)]
+# df = pd.DataFrame.from_dict(json, orient='index')
+# # extract the dictionary value from the dataframe column 'close' as a list then feed into a new dataframe
+# df2 = pd.DataFrame(df['close'].values.tolist())
+# # set the index to be the same value as the original Dataframe
+# df2.set_index(df.index, inplace =True)
+# # combine both datafrmae based on the index value (stock symbol)
+# df = pd.concat([df, df2], axis=1, join_axes=[df.index])
+# # drop the columns you don't need
+# df.drop(['open','close','time'], axis=1, inplace=True)
+# # rename column
+# df.rename(columns={'price': 'closing_price'}, inplace=True)
+# # filter based on range - create new dataframe to store value
+# df_filtered = df[(df.closing_price >= 10) & (df.closing_price <= 33.33)]
 # -------------------------
 
 
 
-df.drop('open', axis=1, inplace=True)
-# Testing Class getStockData
-# mydata = getStockData('aapl', 'chart/1m')
-# print(mydata.stockJSON)
-# print(mydata.df)
+# df.drop('open', axis=1, inplace=True)
+# # Testing Class getStockData
+# # mydata = getStockData('aapl', 'chart/1m')
+# # print(mydata.stockJSON)
+# # print(mydata.df)
 
-from pandas.io.json import json_normalize
-df = pd.DataFrame.from_dict(json, orient='index')
-df['ddd'] = df['close'].astype(str)
-df['eee'] = df['ddd'].str.extract('time...(\d+)', expand=True)
+# from pandas.io.json import json_normalize
+# df = pd.DataFrame.from_dict(json, orient='index')
+# df['ddd'] = df['close'].astype(str)
+# df['eee'] = df['ddd'].str.extract('time...(\d+)', expand=True)
 
 
-or other option is to have dataframe converted to dictionary then use the map
-... ie see http://cmdlinetips.com/2018/01/how-to-add-a-new-column-to-using-a-dictionary-in-pandas-data-frame/
+# or other option is to have dataframe converted to dictionary then use the map
+# ... ie see http://cmdlinetips.com/2018/01/how-to-add-a-new-column-to-using-a-dictionary-in-pandas-data-frame/
 
 
 
