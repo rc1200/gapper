@@ -110,6 +110,13 @@ def getData(symbol, outputType):
 
 class ShortList(object):
 
+    '''
+    usage example: 
+        get a list of stocks between the low and high price -> myStockList = ShortList(50, 200)
+
+    Methods: *** currently not working as this requires a paid subscription
+
+    '''
     def __init__(self, lowPrice, highPrice):
         self.lowPrice = lowPrice
         self.highPrice = highPrice
@@ -132,6 +139,25 @@ class ShortList(object):
 
 class getStockData(object):
 
+    '''
+    usage example: 
+        get 1 month of data (per day) -> ABC = getStockData('aapl', 'chart/1m')
+
+    Methods:
+        ABC.df_OHLC() - output as Dataframe Open, High, Low, Close
+        ie.
+          date    open    high     low   close    volume
+            0   2019-11-29  266.60  268.00  265.90  267.25  11654363
+            1   2019-12-02  267.27  268.25  263.45  264.16  23693550
+            2   2019-12-03  258.31  259.53  256.29  259.45  29377268
+
+        ABC.json_OHLC() - output as JSON string  Open, High, Low, Close
+    
+        [{'date': '2019-11-29', 'open': 266.6, 'high': 268.0, 'low': 265.9, 'close': 267.25, 'volume': 11654363}, 
+        {'date': '2019-12-02', 'open': 267.27, 'high': 268.25, 'low': 263.45, 'close': 264.16, 'volume': 23693550}]
+
+    '''
+
     def __init__(self, symbol, outputType):
         self.symbol = symbol
         self.outputType = outputType
@@ -148,6 +174,45 @@ class getStockData(object):
         jsondata = jsondata.to_json(orient='records')#.replace('[[', '[{')
         return json.loads(jsondata)
 
+    def is_Up_Down_day(self, row):
+        if row['open'] > row['close']:
+            return 'down'
+        elif row['open'] < row['close']:
+            return 'up'
+        else:
+            return 'same'
+
+
+    def open_vs_close(self):
+
+
+        #  ???? how does this respond for the current day if it is still -1 for current day
+
+
+        # row to check if the current day was an "up" or "down" day based on the open and close
+        self.df['prevDayType'] = self.df.apply(lambda row: self.is_Up_Down_day(row), axis=1)
+        current = self.df.iloc[-1:]
+        prev = self.df.iloc[-2:-1]
+        currentPrice = 300
+
+        # > prev high
+            # if prev up then continue
+            # if prev down then shock
+                
+        # < prev low
+            # if prev up then shock
+            # if prev down then continue
+
+        print(self.df)
+        print('current')
+        print(current)
+        print('prev')
+        print(prev)      
+
+
+        # self.df['new'] = self.df.apply(lambda row: is_Up_Down_day(row), axis=1)
+        # print(self.df)
+        # return a,b,c
 
 
 
