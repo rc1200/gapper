@@ -15,6 +15,7 @@
 import sys, os, base64, datetime, hashlib, hmac
 import requests # pip install requests
 import json
+from secretstuff import access_key, secret_key
 
 from decouple import config # pip install python-decouple
 # see example of decouple where you use a .env file in the root to store your credentials
@@ -33,12 +34,6 @@ import pandas as pd
 # ************* REQUEST VALUES *************
 
 host = 'cloud.iexapis.com'
-
-# access_key = config('IEX_PUBLIC_KEY')
-# secret_key = config('IEX_SECRET_KEY')
-
-access_key = 'pk_908d3547248549428866b03ba25e03e5'
-secret_key = 'sk_8706ac0f72e2481995ad2fbc5d372816'
 
 
 # combo to get all market data so I can shortlit based on Price
@@ -183,17 +178,21 @@ class getStockData(object):
             return 'same'
 
 
-    def open_vs_close(self):
+    def open_vs_close(self, latestPrice):
 
-
+        #  latest price
+        # https://cloud.iexapis.com/beta/stock/aapl/quote/latestPrice?token=pk_908d3547248549428866b03ba25e03e5
         #  ???? how does this respond for the current day if it is still -1 for current day
 
 
         # row to check if the current day was an "up" or "down" day based on the open and close
         self.df['prevDayType'] = self.df.apply(lambda row: self.is_Up_Down_day(row), axis=1)
+
+
+        # **** when Market is open or after close, then -1 will be previous day
+        #  Need to confirm how it reacts before market open
         current = self.df.iloc[-1:]
         prev = self.df.iloc[-2:-1]
-        currentPrice = 300
 
         # > prev high
             # if prev up then continue
@@ -208,6 +207,7 @@ class getStockData(object):
         print(current)
         print('prev')
         print(prev)      
+        print(f'latestPrice is {latestPrice}')
 
 
         # self.df['new'] = self.df.apply(lambda row: is_Up_Down_day(row), axis=1)
